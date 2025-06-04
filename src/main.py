@@ -74,6 +74,8 @@ def main():
     # Iterate over each entity entry
     for i, entry in enumerate(entries):
 
+        print(f"Processing entry {i + 1} of {len(entries)}: {entry['name']}")
+
         entity_id, latitude, longitude = search_entity_and_coordinates(entry, token)
 
         if not entity_id:
@@ -104,7 +106,6 @@ def main():
         temperature = None
         if latitude and longitude:
             temperature = get_current_temperature(latitude, longitude)
-            print(f"Current temperature at entity location: {temperature}°C")
         else:
             print("Coordinates not found for this entity.")
 

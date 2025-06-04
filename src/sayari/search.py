@@ -34,7 +34,6 @@ def search_entity_and_coordinates(entry: dict, token: str) -> tuple[Any, Any, An
         # Sayari returns the most relevant result first
         first_result = data[0]
         entity_id = first_result.get("id", "Not found")
-        print(f"Found entity_id: {entity_id}")
 
         coordinates = first_result.get("coordinates", [])
         lat = lng = "Not found"
@@ -42,7 +41,6 @@ def search_entity_and_coordinates(entry: dict, token: str) -> tuple[Any, Any, An
         if coordinates and isinstance(coordinates, list) and len(coordinates) > 0:
             lat = coordinates[0].get("lat", "Not found")
             lng = coordinates[0].get("lng", "Not found")
-            print(f"Coordinates found: ({lat}, {lng})")
         else:
             print("No coordinates found.")
 
