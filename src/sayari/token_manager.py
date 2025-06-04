@@ -1,5 +1,6 @@
 from sayari.auth import get_access_token
 
+# Cache token to avoid repeated requests
 _cached_token = None
 
 def get_token():

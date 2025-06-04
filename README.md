@@ -1,45 +1,45 @@
 # Sayari Entity Enrichment
 
-This project demonstrates how to enrich entity profiles using the Sayari API, combined with external geolocation and weather data. It's designed as a proof of concept (PoC) to simulate a real-world scenario a Solutions Engineer might encounter.
+This is a small project I built to demonstrate how to enrich entity profiles using the Sayari API, along with some external data like geolocation and real-time weather. It's meant to simulate a real-world scenario that a Solutions Engineer might face during a client engagement.
 
 ## Project Structure
 
-- `sayari/`: Handles Sayari API authentication and search
-- `utils/`: Utility functions for weather, file handling, and entity detail extraction
-- `src/main.py`: Entry point for loading, processing, and exporting enriched Excel data
+- `sayari/`: Functions to authenticate and query the Sayari API
+- `utils/`: Helpers for file reading, weather lookup, and entity details
+- `src/main.py`: Main script that ties everything together — from reading the Excel file to exporting enriched results
 
 ## Requirements
 
 - Python 3.10+
-- Required packages listed in `requirements.txt`
+- All required libraries are listed in `requirements.txt`
 
 ## How to Run
 
-1. Clone or download this repository.
-2. Install dependencies:
+1. Clone or download this repo  
+2. Install the dependencies:
    pip install -r requirements.txt
-3. Run the application:
+3. Run the script:
 python src/main.py
-4. Select the input Excel file when prompted.
-5. After processing, choose where to save the enriched output.
+4. Select your input Excel file when the file dialog opens
+5. Once it's done, you'll be asked where to save the output
 
 ## Input File Format
-The input Excel file must have at least one sheet with the following required columns (case-insensitive):
+Your Excel file should have at least one sheet that includes these three columns (case-insensitive):
 - name
 - address
-- country (must be ISO 3-letter country code, e.g., RUS, CHN)
+- country (use the 3-letter ISO code like RUS, CHN, USA, etc.)
 
 ## Output
-The output Excel file will contain the original data plus enriched fields including:
+The output is another Excel file with your original data plus new columns, including:
 - Sayari entity ID
 - Sanctions status
 - Export control flags and levels
 - Related entities count
-- Risk indicators (e.g., SOE adjacency, sanctioned adjacency)
+- Risk indicators 
 - Geolocation (latitude and longitude)
-- Real-time temperature at entity location
+- Current temperature at entity location
 
 ## Notes
-- The Sayari API token is retrieved securely using the internal token_manager.
-- The script includes basic error handling and logs when entities or data are not found.
-- This project is intended as a sample PoC and can be easily extended for production use.
+- The Sayari token is fetched automatically (just make sure your credentials are set as environment variables).
+- I added basic error handling to skip missing or incomplete entries without breaking the process.
+- This is a proof of concept, but the code can be adapted for more advanced use cases or even production if needed.

@@ -7,10 +7,9 @@ CLIENT_SECRET = os.getenv("SAYARI_CLIENT_SECRET")
 AUDIENCE = "sayari.com"
 
 def get_access_token():
-    """Retrieve an access token from Sayari API using client credentials."""
-
+    # Faz a autenticação com a API da Sayari usando client credentials
     if not CLIENT_ID or not CLIENT_SECRET:
-        raise ValueError("Missing API credentials. Please set SAYARI_CLIENT_ID and SAYARI_CLIENT_SECRET environment variables.")
+        raise ValueError("API credentials are missing. Please check SAYARI_CLIENT_ID and SAYARI_CLIENT_SECRET.")
 
     payload = {
         "client_id": CLIENT_ID,
@@ -24,8 +23,9 @@ def get_access_token():
         response.raise_for_status()
         token = response.json().get("access_token")
         if not token:
-            raise ValueError("Token not found in Sayari response.")
+            raise ValueError("Access token not found in the response.")
         return token
     except requests.exceptions.RequestException as e:
-        print(f"Error retrieving token from Sayari API: {e}")
+        print("Couldn’t retrieve token from Sayari API.")
+        print(e)
         raise

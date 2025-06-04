@@ -12,7 +12,7 @@ from datetime import datetime
 REQUIRED_COLUMNS = {"name", "address", "country"}
 
 def select_file():
-    """Open file dialog and return the selected file path."""
+    # Abre o diálogo para o usuário escolher o arquivo Excel
     root = Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename(
@@ -22,64 +22,55 @@ def select_file():
     return file_path
 
 def validate_file(file_path):
-    """Validate file extension and content."""
+    # Valida se o arquivo é válido e contém os dados esperados
     if not file_path:
         print("No file selected.")
         sys.exit()
 
     if not file_path.endswith(".xlsx"):
-        print("Invalid file type. Only .xlsx files are supported.")
+        print("Invalid file type. Please select a .xlsx file.")
         sys.exit()
 
     try:
         excel_file = pd.ExcelFile(file_path)
     except Exception as e:
-        print(f"Failed to read Excel file: {e}")
+        print(f"Could not read the Excel file: {e}")
         sys.exit()
 
-    all_sheets = excel_file.sheet_names
-
     valid_sheets = []
-    for sheet in all_sheets:
+    for sheet in excel_file.sheet_names:
         df = pd.read_excel(excel_file, sheet_name=sheet)
         df_columns = set(df.columns.str.lower())
         if REQUIRED_COLUMNS.issubset(df_columns):
-            if df.shape[0] == 0:
+            if df.empty:
                 print(f"Sheet '{sheet}' is empty.")
             else:
                 valid_sheets.append(sheet)
         else:
-            print(f"Sheet '{sheet}' does not contain required columns: {REQUIRED_COLUMNS}")
+            print(f"Sheet '{sheet}' is missing required columns: {REQUIRED_COLUMNS}")
 
     if not valid_sheets:
-        print("No valid sheet found with required columns and data.")
+        print("No sheet with the expected structure was found.")
         sys.exit()
 
-    print("File is valid.")
+    print("File loaded successfully.")
     return excel_file, valid_sheets
 
 def main():
-
     file_path = select_file()
     excel_file, valid_sheets = validate_file(file_path)
 
-    # Get the token once
     token = get_token()
-
-    # Read data entries
     entries = extract_entities_from_excel(file_path)
-
     enriched_data = []
 
-    # Iterate over each entity entry
     for i, entry in enumerate(entries):
-
-        print(f"Processing entry {i + 1} of {len(entries)}: {entry['name']}")
+        print(f"Looking up entity {i + 1}/{len(entries)}: {entry['name']}")
 
         entity_id, latitude, longitude = search_entity_and_coordinates(entry, token)
 
         if not entity_id:
-            print(f"Entity not found for: {entry['name']}")
+            print(f"No results found for: {entry['name']}")
             enriched_data.append({
                 **entry,
                 "entity_id": "Not found",
@@ -101,13 +92,13 @@ def main():
             })
             continue
 
-        entity_details = get_entity_details(entity_id=entity_id, token=token)
+        entity_details = get_entity_details(entity_id, token)
 
-        temperature = None
         if latitude and longitude:
             temperature = get_current_temperature(latitude, longitude)
         else:
-            print("Coordinates not found for this entity.")
+            print("No coordinates available for this entity.")
+            temperature = None
 
         enriched_data.append({
             **entry,
@@ -124,20 +115,18 @@ def main():
             "relationship_count": entity_details.get("relationship_count", "Not found"),
             "related_entities_count": entity_details.get("related_entities_count", "Not found"),
             "source_count": entity_details.get("source_count", "Not found"),
-            "latitude": latitude if latitude is not None else "Not found",
-            "longitude": longitude if longitude is not None else "Not found",
+            "latitude": latitude or "Not found",
+            "longitude": longitude or "Not found",
             "temperature": temperature if temperature is not None else "Not available"
         })
 
-        # Respect rate limits
         time.sleep(1)
 
-    # Generate timestamp string
     timestamp = datetime.now().strftime("%Y%m%d_%H-%M-%S")
-    default_filename = f"sayari_enriched_entities_{timestamp}.xlsx"
+    default_filename = f"sayari_output_{timestamp}.xlsx"
 
-    # Save enriched data to user-selected location
     df_output = pd.DataFrame(enriched_data)
+
     output_path = filedialog.asksaveasfilename(
         title="Save Enriched Excel File",
         defaultextension=".xlsx",
@@ -147,9 +136,9 @@ def main():
 
     if output_path:
         df_output.to_excel(output_path, index=False)
-        print(f"Enriched data saved to {output_path}")
+        print(f"File saved at: {output_path}")
     else:
-        print("Save operation cancelled.")
+        print("Save canceled.")
 
 if __name__ == "__main__":
     main()

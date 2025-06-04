@@ -6,7 +6,7 @@ def extract_entities_from_excel(file_path: str):
     try:
         xl = pd.ExcelFile(file_path)
     except Exception as e:
-        raise ValueError(f"Failed to read Excel file: {str(e)}")
+        raise ValueError(f"Couldn’t open the Excel file: {e}")
 
     entries = []
 
@@ -14,17 +14,18 @@ def extract_entities_from_excel(file_path: str):
         try:
             df = xl.parse(sheet_name)
         except Exception as e:
-            print(f"⚠️ Skipping sheet '{sheet_name}' due to error: {str(e)}")
+            print(f"Skipping sheet '{sheet_name}' (error reading it): {e}")
             continue
 
         if df.empty:
-            print(f"⚠️ Skipping empty sheet: {sheet_name}")
+            print(f"Sheet '{sheet_name}' is empty. Skipping.")
             continue
 
-        # Normalize columns
+        # Lowercase and strip column names
         df.columns = [col.strip().lower() for col in df.columns]
+
         if not REQUIRED_COLUMNS.issubset(df.columns):
-            print(f"⚠️ Sheet '{sheet_name}' missing required columns. Skipping.")
+            print(f"Sheet '{sheet_name}' is missing required columns.")
             continue
 
         for idx, row in df.iterrows():
@@ -33,17 +34,17 @@ def extract_entities_from_excel(file_path: str):
             country = str(row.get("country", "")).strip()
 
             if not name and not address:
-                continue  # Skip rows with no useful data
+                continue  # skip incomplete row
 
             entries.append({
                 "sheet": sheet_name,
-                "row": idx + 2,  # +2 because pandas is 0-indexed and we skip header
+                "row": idx + 2,  # +2 for header and zero-indexing
                 "name": name,
                 "address": address,
                 "country": country
             })
 
     if not entries:
-        raise ValueError("No valid data rows found in any sheet.")
+        raise ValueError("No usable rows found in the Excel file.")
 
     return entries

@@ -1,8 +1,8 @@
 import requests
 
-def get_current_temperature(latitude: float, longitude: float) -> str | float:
+def get_current_temperature(latitude: float, longitude: float) -> float | str:
     if latitude == "Not found" or longitude == "Not found":
-        print("Invalid coordinates: skipping weather API.")
+        print("Skipping weather lookup — no coordinates available.")
         return "Not available"
 
     try:
@@ -13,7 +13,10 @@ def get_current_temperature(latitude: float, longitude: float) -> str | float:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        return data.get("current", {}).get("temperature_2m", "Not available")
+
+        temperature = data.get("current", {}).get("temperature_2m")
+        return temperature if temperature is not None else "Not available"
+
     except requests.RequestException as e:
-        print(f"Error fetching weather data: {e}")
+        print(f"Couldn’t get weather info: {e}")
         return "Not available"
