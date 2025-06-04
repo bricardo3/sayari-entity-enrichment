@@ -1,0 +1,8 @@
+# Ignore Python virtual environments
+.venv/
+
+# macOS system files
+.DS_Store
+
+# PyCharm
+.idea/
