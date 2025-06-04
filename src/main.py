@@ -71,7 +71,7 @@ def main():
 
     enriched_data = []
 
-    # looping all records from the excel file
+    # Iterate over each entity entry
     for i, entry in enumerate(entries):
 
         entity_id, latitude, longitude = search_entity_and_coordinates(entry, token)
@@ -104,7 +104,7 @@ def main():
         temperature = None
         if latitude and longitude:
             temperature = get_current_temperature(latitude, longitude)
-            print("Current temperature at entity location: {}°C".format(temperature))
+            print(f"Current temperature at entity location: {temperature}°C")
         else:
             print("Coordinates not found for this entity.")
 
@@ -146,7 +146,7 @@ def main():
 
     if output_path:
         df_output.to_excel(output_path, index=False)
-        print(f"\nEnriched data saved to {output_path}")
+        print(f"Enriched data saved to {output_path}")
     else:
         print("Save operation cancelled.")
 

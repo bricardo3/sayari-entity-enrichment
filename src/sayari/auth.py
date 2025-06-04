@@ -7,6 +7,8 @@ CLIENT_SECRET = os.getenv("SAYARI_CLIENT_SECRET")
 AUDIENCE = "sayari.com"
 
 def get_access_token():
+    """Retrieve an access token from Sayari API using client credentials."""
+
     if not CLIENT_ID or not CLIENT_SECRET:
         raise ValueError("Missing API credentials. Please set SAYARI_CLIENT_ID and SAYARI_CLIENT_SECRET environment variables.")
 
@@ -25,5 +27,5 @@ def get_access_token():
             raise ValueError("Token not found in Sayari response.")
         return token
     except requests.exceptions.RequestException as e:
-        print("Failed to get token:", str(e))
+        print(f"Error retrieving token from Sayari API: {e}")
         raise
